@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("Введіть шлях до файлу");
+        System.out.println("Введіть шлях до файлу в якому зашифроване повідомдення або в якому хочете зашифрувати повідомлення");
         Scanner s = new Scanner(System.in);
         String path = s.nextLine();
         File file = new File(path);
@@ -17,9 +17,10 @@ public class Main {
         try {
             int number = Integer.parseInt(n);
             if (number == 1) {
-                System.out.println("Введіть фразу яку хочете зашифрувати: ");
-                String text = s.nextLine();
-                encryptPhrase(file, text);
+                System.out.println("Вкажіть шлях до файлу з текстом який потрібно зашифрувати");
+                String textFilePath = s.nextLine();
+                File textFile = new File(textFilePath);
+                encryptPhrase(file, textFile);
             } if (number == 2) {
                 decryptPhrase(file);
             }
@@ -29,9 +30,10 @@ public class Main {
         }
     }
 
-    private static void encryptPhrase(File file, String text) throws IOException {
-        byte[] outBytes = Files.readAllBytes(file.toPath());
-        byte[] textBytes = text.getBytes();
+    private static void encryptPhrase(File targetFile, File messageFile) throws IOException {
+        byte[] outBytes = Files.readAllBytes(targetFile.toPath());
+        byte[] textBytes = Files.readAllBytes(messageFile.toPath());
+        String text = readFileToString(messageFile.getPath());
         byte[] endBytes;
 
         if (outBytes.length < textBytes.length) {
@@ -67,7 +69,10 @@ public class Main {
             }
         }
         try {
-            Files.write(Paths.get(file.getPath()), endBytes);
+            StringBuilder path = new StringBuilder(targetFile.getPath());
+            String format = path.substring(path.lastIndexOf(".") + 1);
+            Files.write(Paths.get("result." + format), endBytes);
+            System.out.println("Кінцевий файл згенерований у: " + Paths.get("").toRealPath());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -94,6 +99,18 @@ public class Main {
         }
         String phrase = new String(e, StandardCharsets.UTF_8);
         System.out.println(phrase);
+    }
+
+
+    private static String readFileToString(String path) throws FileNotFoundException {
+        Scanner in = new Scanner(new FileReader(path));
+        StringBuilder sb = new StringBuilder();
+
+        while(in.hasNext()) {
+            sb.append(in.nextLine()).append(" ");
+        }
+
+        return sb.toString();
     }
 
 

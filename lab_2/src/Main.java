@@ -1,12 +1,8 @@
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
 
@@ -15,24 +11,19 @@ public class Main {
         System.out.println("Введіть шлях до файлу");
         Scanner s = new Scanner(System.in);
         String path = s.nextLine();
-
-
-        double[] list = readNumbersFromFile(path);
-        double result = 0.0;
-        if (list != null) {
-            result = calcEntropySimple(list);
-        }
+        double entropy = calcEntropy(calcProbability(readFile(path)));
+        System.out.println("Ентропія файлу: " + entropy);
         try {
-            Files.write(Paths.get(path), String.valueOf(result).getBytes());
+            Files.write(Paths.get(path), String.valueOf(entropy).getBytes());
+            System.out.println("Дані успішно записані у файл");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(result);
     }
 
 
-    private static double calcEntropySimple(double[] list){
-        // Calculate entropy
+    private static double calcEntropy(double[] list){
+
         double entropy = 0;
         for (int i = 0; i < list.length; i++) {
             if(Double.isNaN(list[i])){
@@ -50,16 +41,30 @@ public class Main {
     }
 
 
-    private  static double[] readNumbersFromFile(String path) throws FileNotFoundException {
+    private  static char[] readFile(String path) throws FileNotFoundException {
         Scanner in = new Scanner(new FileReader(path));
-        List<Double> list = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
         while(in.hasNext()) {
-            list.add(Double.parseDouble(in.next()));
+            sb.append(in.next()).append(" ");
         }
-        double[] resultArray = new double[list.size()];
-        for (int i = 0; i<list.size(); i++) {
-            resultArray[i] = list.get(i);
+        return  sb.toString().toCharArray();
+    }
+
+    private static double[] calcProbability(char[] fileChars) {
+        Map<Character, Double> counts = new HashMap<>();
+        for (char c : fileChars) {
+            if (!counts.containsKey(c)) {
+                counts.put(c, 1.0);
+            } else {
+                counts.put(c, counts.get(c) + 1.0);
+            }
         }
-        return resultArray;
+        double[] p = new double[counts.size()];
+        int index = 0;
+        for (char c : counts.keySet()) {
+            p[index] = counts.get(c) / fileChars.length;
+            index++;
+        }
+        return p;
     }
 }
