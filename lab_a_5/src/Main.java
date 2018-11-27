@@ -16,10 +16,10 @@ public class Main {
         Scanner s = new Scanner(System.in);
         String path = s.nextLine();
         File file = new File(path);
-        System.out.println("Вкажіть шлях до файлу з текстом який потрібно зашифрувати");
+        System.out.println("Введіть шлях до файлу який потрібно зашифрувати");
         String bookFilePath = s.nextLine();
         File bookFile = new File(bookFilePath);
-        System.out.println("Що потрібно зробити з файлом? \n 1 зашифрувати \n 2 Розшифрувати");
+        System.out.println("Введіть шлях до файлу сторінки книги");
         String n = s.nextLine();
         try {
             int number = Integer.parseInt(n);
